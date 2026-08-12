@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Scooter Data Analytics Dashboard</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Chart.js & PapaParse Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body class="bg-light">
+
+  <div class="container py-4">
+    <!-- Header -->
+    <header class="pb-3 mb-4 border-bottom">
+      <h2 class="text-dark">🛵 EV Scooter Data Analytics Dashboard</h2>
+      <p class="text-muted mb-0">ระบบวิเคราะห์สมรรถนะการขับขี่ สภาพพลังงาน และการประเมินสุขภาพแบตเตอรี่ล่วงหน้า</p>
+    </header>
+
+    <!-- ส่วนที่ 1: เลือกไฟล์ CSV -->
+    <div class="card shadow-sm p-3 mb-4">
+      <h5 class="card-title">นำเข้าข้อมูลการขับขี่ (CSV Data Input)</h5>
+      <p class="card-text text-muted small">เลือกไฟล์ datalog.csv เพื่อนำเข้าข้อมูลวิเคราะห์</p>
+      <input type="file" id="csvFileInput" class="form-control" accept=".csv">
+    </div>
+
+    <!-- ส่วนที่ 2: การ์ด Predictive Maintenance & Battery SOH (เพิ่มแทรกใหม่ตรงนี้) -->
+    <div class="card shadow-sm p-3 mb-4 border-start border-primary border-4">
+      <h5 class="card-title text-primary">การประเมินสุขภาพแบตเตอรี่ล่วงหน้า (Predictive Maintenance)</h5>
+      <div class="mt-2">
+        <span id="batterySohBadge" class="badge bg-secondary fs-6">Battery SOH: --%</span>
+      </div>
+      <p id="sohAdvice" class="mt-2 text-muted mb-0">กรุณานำเข้าไฟล์ CSV เพื่อให้ระบบทำการคำนวณและประเมินสุขภาพแบตเตอรี่</p>
+    </div>
+
+    <!-- ส่วนที่ 3: กราฟและชุดการ์ดสถานะเดิมทั้งหมด -->
+    <div class="row g-4">
+      
+      <!-- กราฟที่ 1: Speed & Power -->
+      <div class="col-12">
+        <div class="card shadow-sm p-3">
+          <h6 class="card-subtitle mb-2 text-muted">พฤติกรรมการขับขี่ (Speed vs Power)</h6>
+          <canvas id="chartSpeedPower"></canvas>
+          
+          <!-- การ์ดวิเคราะห์เดิมตามภาพที่ 1 -->
+          <div id="cardSpeedPowerAnalysis" class="card mt-3 p-3 bg-light border-0">
+            <span class="badge bg-secondary mb-2 align-self-start" id="badgeSpeedPower">รอประมวลผล</span>
+            <h6 class="fw-bold text-dark">💡 ผลการวิเคราะห์พฤติกรรมการขับขี่ (Speed & Power)</h6>
+            <ul class="mb-0 ps-3 text-muted small" id="textSpeedPowerAnalysis">
+              <li>การวิเคราะห์จริง: รอไฟล์ข้อมูล CSV...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- กราฟที่ 2: Voltage & Battery % -->
+      <div class="col-12">
+        <div class="card shadow-sm p-3">
+          <h6 class="card-subtitle mb-2 text-muted">สถานะพลังงาน: แรงดันไฟและเปอร์เซ็นต์แบตเตอรี่</h6>
+          <canvas id="chartVoltageBattery"></canvas>
+          
+          <!-- การ์ดวิเคราะห์เดิมตามภาพที่ 2 -->
+          <div id="cardEnergyAnalysis" class="card mt-3 p-3 bg-light border-0">
+            <span class="badge bg-secondary mb-2 align-self-start" id="badgeEnergy">รอประมวลผล</span>
+            <h6 class="fw-bold text-dark">💡 ผลการวิเคราะห์สถานะพลังงาน (Voltage & Battery %)</h6>
+            <ul class="mb-0 ps-3 text-muted small" id="textEnergyAnalysis">
+              <li>การวิเคราะห์จริง: รอไฟล์ข้อมูล CSV...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- กราฟที่ 3: Motor Temperature -->
+      <div class="col-12">
+        <div class="card shadow-sm p-3">
+          <h6 class="card-subtitle mb-2 text-muted">อุณหภูมิมอเตอร์ตามช่วงเวลา (Motor Temperature)</h6>
+          <canvas id="chartTemp"></canvas>
+          
+          <!-- การ์ดวิเคราะห์เดิมตามภาพที่ 3 -->
+          <div id="cardTempAnalysis" class="card mt-3 p-3 bg-light border-0">
+            <span class="badge bg-secondary mb-2 align-self-start" id="badgeTemp">รอประมวลผล</span>
+            <h6 class="fw-bold text-dark">💡 ผลการวิเคราะห์อุณหภูมิมอเตอร์ (Motor Temperature)</h6>
+            <ul class="mb-0 ps-3 text-muted small" id="textTempAnalysis">
+              <li>การวิเคราะห์จริง: รอไฟล์ข้อมูล CSV...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- เชื่อมต่อไฟล์ script.js -->
+  <script src="script.js"></script>
+</body>
+</html>
